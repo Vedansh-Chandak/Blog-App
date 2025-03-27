@@ -1,6 +1,6 @@
 import React from "react"
 import { useState } from "react";
-
+import{ API} from "../../service/api.js"
 import {Box, TextField, Button, styled, Typography} from '@mui/material';
 const Component = styled(Box)`
    width: 400px;
@@ -34,6 +34,15 @@ height: 48px;
     margin-top: 20px
      }
    `
+   const Error = styled(Typography) `
+    
+   font-size: 10px;
+   colour: red;
+   line-height: 0;
+   margin-top: 10px;
+   font-weight: 600;
+   `
+  
 const Image = styled('img')({
     width: 100,
     margin: 'auto',
@@ -41,12 +50,35 @@ const Image = styled('img')({
     padding: '50px 0 0 ',
 
 })
+const signupInitialValues = {
+  name: "",
+  username: "",
+  password: ""
+}
+
 const Login = () =>{
     const ImgUrl = "https://imgs.search.brave.com/JqgdIWrQurPXtphlqU2hFpD1FzBD5ZQAJs0pOYiJZ9Q/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9sb2dv/LmNvbS9pbWFnZS1j/ZG4vaW1hZ2VzL2t0/czkyOHBkL3Byb2R1/Y3Rpb24vM2QwYTE5/NDJlYTYxNzgyNWUx/ODdjM2M5YTM4MTFh/NWQ5M2EzMzFiZS0z/NzB4MzY2LnBuZz93/PTEwODAmcT03MiZm/bT13ZWJw"
     const [account, toggleAccount] = useState('login')
+    const [signup , setsignup] = useState(signupInitialValues)
+    const [error, setError] = useState("");
     const toogleSignup = () =>{
      account === 'login' ? toggleAccount('signup') : toggleAccount('login');
     }
+    const onInputchange =(e) =>{
+       setsignup({...signup, [e.target.name]: e.target.value})
+    }
+
+    const signUpUser =async () =>{
+ let response = await API.userSignup(signup)
+ console.log(response.data)
+ if(response.isSuccess){
+  setError("")
+  setsignup(signupInitialValues);
+  toggleAccount('login')
+ } else {
+  setError('something went wrong please try again')
+ }
+}
     return(
     <Component>
        <Box>
@@ -64,10 +96,11 @@ const Login = () =>{
         </Wrapper>
 :
         <Wrapper>
-        <TextField variant="standard" label="Enter Name" />
-        <TextField variant="standard" label="Enter username"/>
-        <TextField variant="standard" label="Enter Password" />
-        <LoginButton variant="contained">SignUp</LoginButton>
+        <TextField onChange={(e)=> onInputchange(e)} name="name" variant="standard" label="Enter Name" />
+        <TextField onChange={(e)=> onInputchange(e)} name="username" variant="standard" label="Enter username"/>
+        <TextField onChange={(e)=> onInputchange(e)} name="password" variant="standard" label="Enter Password" />
+          {error && <Error>{error}</Error>}
+        <LoginButton onClick={()=> signUpUser()} variant="contained">SignUp</LoginButton>
         <Typography>
             OR
         </Typography>
