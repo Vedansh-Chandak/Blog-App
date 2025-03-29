@@ -7,6 +7,7 @@ import Home from "./Components/home/Home";
 import Header from "./Components/Header/Header";
 
 import { BrowserRouter, Routes, Route, Navigate, Outlet} from 'react-router-dom'
+import CreatePost from "./Components/Create/CreatePost";
 const PrivateRoute = ({isAuthenticated, ...props})=>{
   return (
     isAuthenticated ? <>
@@ -34,6 +35,11 @@ const [isAuthenticated, isUserAuthenticated] = useState(false);
         //PRIVATE ROUTE
         <Route  path="/" element={<PrivateRoute isAuthenticated={isAuthenticated} />}>
      <Route path="/" element={<Home/>} />
+     </Route>
+
+     <Route  path="/create" element={<PrivateRoute isAuthenticated={isAuthenticated} />}>
+     <Route path="/create" element={<CreatePost/>} />
+
 
      </Route>
         </Routes>
