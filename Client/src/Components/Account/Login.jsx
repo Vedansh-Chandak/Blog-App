@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useState } from "react";
 import { API } from "../../service/api.js";
 import { Box, TextField, Button, styled, Typography } from "@mui/material";
+import {DataContext} from "../../context/DataProvider.jsx";
+import { useNavigate } from "react-router-dom";
 const Component = styled(Box)`
    width: 400px;
    margin: auto:
@@ -62,13 +64,15 @@ const signupInitialValues = {
   password: "",
 };
 
-const Login = () => {
+const Login = ({isUserAuthenticated}) => {
   const ImgUrl =
     "https://imgs.search.brave.com/JqgdIWrQurPXtphlqU2hFpD1FzBD5ZQAJs0pOYiJZ9Q/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9sb2dv/LmNvbS9pbWFnZS1j/ZG4vaW1hZ2VzL2t0/czkyOHBkL3Byb2R1/Y3Rpb24vM2QwYTE5/NDJlYTYxNzgyNWUx/ODdjM2M5YTM4MTFh/NWQ5M2EzMzFiZS0z/NzB4MzY2LnBuZz93/PTEwODAmcT03MiZm/bT13ZWJw";
   const [account, toggleAccount] = useState("login");
   const [signup, setsignup] = useState(signupInitialValues);
   const [error, setError] = useState("");
   const [login, setLogin] = useState(loginInitialValue);
+  const {setAccount} = useContext(DataContext);
+  const nevigate = useNavigate();
   const toogleSignup = () => {
     account === "login" ? toggleAccount("signup") : toggleAccount("login");
   };
@@ -102,7 +106,9 @@ setLogin({...login, [e.target.name]: e.target.value});
     
       sessionStorage.setItem('accessToken', `Bearer ${response.data.accessToken}`);
       sessionStorage.setItem('refreshToken' , `Bearer ${response.data.refreshToken}`);
-      
+      setAccount({username: response.data.username, name: response.data.name});
+      isUserAuthenticated(true);
+      nevigate("/");
     }
     else{
       setError("something went wrong please try again")
