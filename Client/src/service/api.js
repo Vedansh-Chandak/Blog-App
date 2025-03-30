@@ -78,7 +78,7 @@ for (const [key, value] of Object.entries(SERVICE_URL)) {
       method: value.method,
       url: value.url,
       data: body,
-      responseType: value.responseType,
+      responseType: value.responseType || "json",
       onUploadProgress: function (progressEvent) {
         if (showUploadProcess) {
           let percentageCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -93,5 +93,7 @@ for (const [key, value] of Object.entries(SERVICE_URL)) {
       }
     });
 }
+
+
 
 export { API };

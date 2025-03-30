@@ -1,0 +1,25 @@
+import { GridFsStorage } from 'multer-gridfs-storage'
+import dotenv from 'dotenv'
+import multer from 'multer';
+
+dotenv.config();
+const USERNAME = process.env.DB_USERNAME;
+const PASSWORD = process.env.DB_PASSWORD;
+
+const storage = new GridFsStorage({
+  url: `mongodb+srv://${USERNAME}:${PASSWORD}@cluster0.vmi6l.mongodb.net`,
+  options: {useNewUrlParser: true},
+  file: (request, file) => {
+    const match = ["image/png", "image/jpg"];
+
+    if(match.indexOf(file.memeType)=== -1){
+        returm `${Date.now()}-blog-${file.originalname}`
+    }
+    return {
+        bucketName: "photos",
+        filename: `${Date.now()}-blog-${file.originalname}`
+    }
+  }
+})
+
+export default multer({ storage })

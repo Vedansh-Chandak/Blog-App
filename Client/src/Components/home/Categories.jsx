@@ -1,10 +1,12 @@
-import { Button, Table, TableBody, TableCell, TableHead, TableRow,styled } from "@mui/material";
+import { Button, Table, TableBody, TableCell, TableHead, TableRow, styled } from "@mui/material";
 import { categories } from "../../../constants/Data.js";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 const StyledTable = styled(Table)`
-border: 1px solid rgba(224, 224, 1);
-`
+  border: 1px solid rgba(224, 224, 1);
+  margin-top: 20px;
+`;
+
 const StyledButton = styled(Button)`
   margin: 20px auto;
   width: 90%;
@@ -29,33 +31,52 @@ const StyledButton = styled(Button)`
   }
 `;
 
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+  font-weight: bold;
+  &:hover {
+    color: #0056b3;
+  }
+`;
+
+const StyledTableRow = styled(TableRow)`
+  &:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    cursor: pointer;
+  }
+`;
+
 const Categories = () => {
+  const [searchParams] = useSearchParams();
+  const category = searchParams.get('category');
+
   return (
     <>
-      <Link to={`/create?category`} style={{textDecoration: 'none'}}>
-      <StyledButton variant="contained" color="primary" style={{ marginBottom: "20px" }}>
-        Create Blog
-      </StyledButton>
-      </Link>
+      <StyledLink to={`/create?category=${category || ""}`}>
+        <StyledButton variant="contained" color="primary">
+          Create Blog
+        </StyledButton>
+      </StyledLink>
       
       <StyledTable>
         <TableHead>
           <TableRow>
             <TableCell style={{ fontWeight: "bold", fontSize: "18px" }}>
-              <Link to='/' >
-              All Categories
-</Link>
+              <StyledLink to="/">All Categories</StyledLink>
             </TableCell>
           </TableRow>
         </TableHead>
 
         <TableBody>
           {categories.map((category) => (
-            <TableRow key={category.id}>
-              <TableCell><Link to={`/?category=${category.type}`} >
-              {category.type}
-              </Link></TableCell>
-            </TableRow>
+            <StyledTableRow key={category.id}>
+              <TableCell>
+                <StyledLink to={`/?category=${category.type}`}>
+                  {category.type}
+                </StyledLink>
+              </TableCell>
+            </StyledTableRow>
           ))}
         </TableBody>
       </StyledTable>
