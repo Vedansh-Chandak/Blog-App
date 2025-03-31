@@ -80,17 +80,20 @@ for (const [key, value] of Object.entries(SERVICE_URL)) {
       data: body,
       responseType: value.responseType || "json",
       onUploadProgress: function (progressEvent) {
-        if (showUploadProcess) {
+        if (showUploadProcess && progressEvent.total) {
           let percentageCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           showUploadProcess(percentageCompleted);
         }
       },
       onDownloadProgress: function (progressEvent) {
-        if (showDownloadProcess) {
+        if (showDownloadProcess && progressEvent.total) {
           let percentageCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           showDownloadProcess(percentageCompleted);
         }
       }
+    }).catch(error => {
+      console.error('API Error:', error);
+      return error.response?.data || { error: 'Unknown error' };
     });
 }
 
