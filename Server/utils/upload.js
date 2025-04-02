@@ -26,11 +26,15 @@ const storage = new GridFsStorage({
       });
     });
   },
-});
+}
+
+);
 
 storage.on('connection', () => {
   console.log('MongoDB connected successfully');
+ 
 });
+
 
 
 

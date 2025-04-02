@@ -11,7 +11,9 @@ import Router from './routes/route.js';
 dotenv.config();
 
 const app = express();
-app.use(cors('*'));
+app.use(cors({
+    origin: "http://localhost:5173"
+}));
 app.use(bodyParser.json({ extended: true }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/', Router);
