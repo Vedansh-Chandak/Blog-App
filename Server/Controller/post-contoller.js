@@ -12,12 +12,12 @@ export const createPost = async(request, response)=>{
 
 }
 
-export const getAllPosts = async() => {
-try {
-let posts =  await post.find({})
-return response.status(200).json(posts)
+export const getAllPosts = async(req, response) => {
+  try {
+    const posts = await Post.find(); // Ensure this is correct
+    res.status(200).json(posts);
 } catch (error) {
-  return response.status(500).json({msg: error.message})
+    res.status(500).json({ message: "Server error" });
 }
 
 }

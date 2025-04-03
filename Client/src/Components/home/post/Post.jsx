@@ -1,30 +1,60 @@
-import { useEffect, useState } from "react"
-import { API } from "../../../service/api";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Card, CardContent, Typography, CircularProgress, Box } from "@mui/material";
 
+const PostList = () => {
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true); // ✅ Added loading state
 
-const Posts = ()=>{
-    const [posts, setPost] = useState([]);
-    useEffect(()=>{
-const fetchData = async()=>{
-const response =  await API.getAllPosts();
-console.log(response)
-if(response){
-    setPost(response.data);
-}
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/posts", {
+          withCredentials: true, // ✅ Keep CORS settings if necessary
+        });
+        console.log("Fetched Posts:", response.data); // ✅ Debugging API response
+        setPosts(response.data);
+      } catch (error) {
+        console.error("Error fetching posts:", error);
+      } finally {
+        setLoading(false); // ✅ Stop loading after fetch attempt
+      }
+    };
 
-}
-fetchData();
-    },[])
+    fetchPosts();
+  }, []);
 
-    return(
-        <>
-        {
-            posts && posts.length > 0 ? posts.map(post => (
- <div>Hello</div>
-            )) : <div> No data to display</div>
-        }
-        </>
-    )
-}
+  return (
+    <Box sx={{ maxWidth: 800, margin: "auto", padding: 3 }}>
+      <Typography variant="h4" align="center" gutterBottom>
+        Posts
+      </Typography>
 
-export default Posts
+      {loading ? (
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : posts.length > 0 ? (
+        posts.map((post) => (
+          <Card key={post._id} sx={{ marginBottom: 2 }}>
+            <CardContent>
+              <Typography variant="h6">{post.title}</Typography>
+              <Typography variant="body2" color="textSecondary">
+                {post.description}
+              </Typography>
+              <Typography variant="caption" color="textSecondary">
+                By {post.username} on {new Date(post.createdDate).toDateString()}
+              </Typography>
+            </CardContent>
+          </Card>
+        ))
+      ) : (
+        <Typography align="center" color="textSecondary">
+          No posts available.
+        </Typography>
+      )}
+    </Box>
+  );
+};
+
+export default PostList;

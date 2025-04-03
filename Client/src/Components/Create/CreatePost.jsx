@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
-
-import { styled, Box, TextareaAutosize, Button, InputBase, FormControl  } from '@mui/material';
+import { styled, Box, TextareaAutosize, Button, InputBase, FormControl } from '@mui/material';
 import { AddCircle as Add } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
-
 import { API } from '../../service/api';
 import { DataContext } from '../../context/DataProvider';
 import axios from 'axios';
@@ -50,50 +48,74 @@ const initialPost = {
     username: '',
     categories: '',
     createdDate: new Date()
-}
-
-
+};
 
 const CreatePost = () => {
     const navigate = useNavigate();
     const location = useLocation();
-
-    const [post, setPost] = useState(initialPost);
-    const [file, setFile] = useState('');
     const { account } = useContext(DataContext);
-
-    const url = post.picture ? post.picture : 'https://images.unsplash.com/photo-1543128639-4cb7e6eeef1b?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8bGFwdG9wJTIwc2V0dXB8ZW58MHx8MHx8&ixlib=rb-1.2.1&w=1000&q=80';
     
+    const [post, setPost] = useState(initialPost);
+    const [file, setFile] = useState(null);
+
+    const defaultImage = 'https://images.unsplash.com/photo-1543128639-4cb7e6eeef1b?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8bGFwdG9wJTIwc2V0dXB8ZW58MHx8MHx8&ixlib=rb-1.2.1&w=1000&q=80';
+    const url = post.picture || defaultImage;
+
     useEffect(() => {
-        const getImage = async () => { 
-            if(file) {
+        if (file) {
+            const uploadImage = async () => {
                 const data = new FormData();
                 data.append("name", file.name);
                 data.append("file", file);
-               try {
-                const response = await API.uploadFile(data);
-                post.picture = response.data;
-               } catch (error) {
-                console.log('Error in bhangbhisda' , error)
-               }
-                
-            }
+
+                try {
+                    const response = await axios.post('http://localhost:8000/file/upload', data, {
+                        headers: {
+                            "Content-Type": "multipart/form-data"
+                        }
+                    });
+
+                    console.log("File Upload Response:", response.data); // Debugging
+
+                    if (response.data?.url) {
+                        setPost(prevState => ({
+                            ...prevState,
+                            picture: response.data.url
+                        }));
+                    }
+                } catch (error) {
+                    console.error('Error uploading image:', error);
+                }
+            };
+
+            uploadImage();
         }
-        getImage();
-        post.categories = location.search?.split('=')[1] || 'All';
-        post.username = account.username;
-    }, [file])
+
+        // Update post details
+        setPost(prevState => ({
+            ...prevState,
+            categories: location.search?.split('=')[1] || 'All',
+            username: account.username
+        }));
+    }, [file, location.search, account.username]);
 
     const savePost = async () => {
-     let response =   await API.createPost(post);
-     if(response.isSuccess){ 
-         navigate('/');
+        try {
+            let response = await API.createPost(post);
+            if (response.isSuccess) {
+                navigate('/');
+            }
+        } catch (error) {
+            console.error("Error creating post:", error);
         }
-    }
+    };
 
     const handleChange = (e) => {
-        setPost({ ...post, [e.target.name]: e.target.value });
-    }
+        setPost(prevState => ({
+            ...prevState,
+            [e.target.name]: e.target.value
+        }));
+    };
 
     return (
         <Container>
@@ -109,18 +131,18 @@ const CreatePost = () => {
                     style={{ display: "none" }}
                     onChange={(e) => setFile(e.target.files[0])}
                 />
-                <InputTextField onChange={(e) => handleChange(e)} name='title' placeholder="Title" />
-                <Button onClick={() => savePost()} variant="contained" color="primary">Publish</Button>
+                <InputTextField onChange={handleChange} name='title' placeholder="Title" />
+                <Button onClick={savePost} variant="contained" color="primary">Publish</Button>
             </StyledFormControl>
 
             <Textarea
                 rowsMin={5}
                 placeholder="Tell your story..."
                 name='description'
-                onChange={(e) => handleChange(e)} 
+                onChange={handleChange}
             />
         </Container>
-    )
-}
+    );
+};
 
 export default CreatePost;
