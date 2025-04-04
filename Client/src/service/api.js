@@ -86,7 +86,6 @@ const processError = (error) => {
 };
 
 const API = {};
-
 for (const [key, value] of Object.entries(SERVICE_URL)) {
   API[key] = (body, showUploadProgress, showDownloadProgress) =>
       axiosInstance({
